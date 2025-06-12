@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clean Code Principles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .code-block {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .glow {
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 overflow-hidden">
+    
+    <!-- Elementos de fondo animados -->
+    <div class="absolute inset-0">
+        <div class="absolute top-20 left-20 w-2 h-2 bg-white rounded-full opacity-60 floating"></div>
+        <div class="absolute top-40 right-32 w-1 h-1 bg-purple-300 rounded-full opacity-40" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-32 left-1/4 w-3 h-3 bg-indigo-400 rounded-full opacity-30 floating" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/3 right-1/4 w-1.5 h-1.5 bg-pink-400 rounded-full opacity-50 floating"></div>
+    </div>
+    
+    <!-- Contenedor principal -->
+    <div class="min-h-screen flex items-center justify-center p-6">
+        <div class="max-w-6xl w-full">
+            
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-5xl md:text-7xl font-black gradient-text mb-4">
+                    CLEAN CODE
+                </h1>
+                <p class="text-xl text-white/80 font-medium">
+                    Principios fundamentales para escribir código limpio y mantenible
+                </p>
+            </div>
+            
+            <!-- Grid de principios -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Principio 1 -->
+                <div class="glass-effect rounded-2xl p-6 glow hover:scale-105 transition-all duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-green-400 to-blue-500 rounded-xl flex items-center justify-center text-white font-bold text-xl mr-4">
+                            📝
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Nombres Claros</h3>
+                    </div>
+                    <p class="text-white/80 mb-4 leading-relaxed">
+                        Usa nombres descriptivos que revelen la intención del código
+                    </p>
+                    <div class="code-block bg-black/30 rounded-lg p-3 text-sm">
+                        <div class="text-red-400">// ❌ Malo</div>
+                        <div class="text-gray-300">let d = 5;</div>
+                        <div class="text-green-400 mt-2">// ✅ Bueno</div>
+                        <div class="text-gray-300">let diasRestantes = 5;</div>
+                    </div>
+                </div>
+                
+                <!-- Principio 2 -->
+                <div class="glass-effect rounded-2xl p-6 glow hover:scale-105 transition-all duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl flex items-center justify-center text-white font-bold text-xl mr-4">
+                            🔧
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Funciones Pequeñas</h3>
+                    </div>
+                    <p class="text-white/80 mb-4 leading-relaxed">
+                        Una función debe hacer una sola cosa y hacerla bien
+                    </p>
+                    <div class="code-block bg-black/30 rounded-lg p-3 text-sm">
+                        <div class="text-blue-400">function calcularImpuesto()</div>
+                        <div class="text-blue-400">function formatearPrecio()</div>
+                        <div class="text-blue-400">function validarEmail()</div>
+                    </div>
+                </div>
+                
+                <!-- Principio 3 -->
+                <div class="glass-effect rounded-2xl p-6 glow hover:scale-105 transition-all duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center text-white font-bold text-xl mr-4">
+                            💬
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Comentarios Útiles</h3>
+                    </div>
+                    <p class="text-white/80 mb-4 leading-relaxed">
+                        El código debe explicarse a sí mismo, comenta solo el "por qué"
+                    </p>
+                    <div class="code-block bg-black/30 rounded-lg p-3 text-sm">
+                        <div class="text-green-400">// Aplicamos descuento debido</div>
+                        <div class="text-green-400">// a política de empresa</div>
+                        <div class="text-gray-300">precio *= 0.85;</div>
+                    </div>
+                </div>
+                
+                <!-- Principio 4 -->
+                <div class="glass-effect rounded-2xl p-6 glow hover:scale-105 transition-all duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-cyan-400 to-teal-500 rounded-xl flex items-center justify-center text-white font-bold text-xl mr-4">
+                            🎯
+                        </div>
+                        <h3 class="text-xl font-bold text-white">DRY Principle</h3>
+                    </div>
+                    <p class="text-white/80 mb-4 leading-relaxed">
+                        Don't Repeat Yourself - Evita la duplicación de código
+                    </p>
+                    <div class="code-block bg-black/30 rounded-lg p-3 text-sm">
+                        <div class="text-blue-400">function procesarDatos(data) {</div>
+                        <div class="text-gray-300">  return data.map(transformar)</div>
+                        <div class="text-gray-300">              .filter(validar);</div>
+                        <div class="text-blue-400">}</div>
+                    </div>
+                </div>
+                
+                <!-- Principio 5 -->
+                <div class="glass-effect rounded-2xl p-6 glow hover:scale-105 transition-all duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-rose-400 to-red-500 rounded-xl flex items-center justify-center text-white font-bold text-xl mr-4">
+                            🚫
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Manejo de Errores</h3>
+                    </div>
+                    <p class="text-white/80 mb-4 leading-relaxed">
+                        Maneja errores de forma explícita y consistente
+                    </p>
+                    <div class="code-block bg-black/30 rounded-lg p-3 text-sm">
+                        <div class="text-purple-400">try {</div>
+                        <div class="text-gray-300">  await procesarArchivo();</div>
+                        <div class="text-purple-400">} catch (error) {</div>
+                        <div class="text-gray-300">  logger.error(error);</div>
+                        <div class="text-purple-400">}</div>
+                    </div>
+                </div>
+                
+                <!-- Principio 6 -->
+                <div class="glass-effect rounded-2xl p-6 glow hover:scale-105 transition-all duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold text-xl mr-4">
+                            🧪
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Testing</h3>
+                    </div>
+                    <p class="text-white/80 mb-4 leading-relaxed">
+                        Escribe tests que documenten el comportamiento esperado
+                    </p>
+                    <div class="code-block bg-black/30 rounded-lg p-3 text-sm">
+                        <div class="text-yellow-400">test('debe calcular precio', () => {</div>
+                        <div class="text-gray-300">  expect(calcular(100))</div>
+                        <div class="text-gray-300">    .toBe(115);</div>
+                        <div class="text-yellow-400">});</div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- Footer -->
+            <div class="text-center mt-12">
+                <div class="inline-flex items-center glass-effect rounded-full px-6 py-3">
+                    <span class="text-white/90 font-medium">💡 "El código limpio es simple y directo"</span>
+                    <span class="text-purple-300 ml-2 font-semibold">- Robert C. Martin</span>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+</body>
+</html>

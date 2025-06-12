@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Métodos HTTP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-900 text-white p-8">
+    
+    <!-- Contenedor principal -->
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Título principal -->
+        <div class="mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
+                Los métodos HTTP definen la acción que se desea realizar sobre un recurso
+            </h1>
+            <p class="text-gray-400 text-lg">
+                Cada método tiene un propósito específico en las APIs REST:
+            </p>
+        </div>
+        
+        <!-- Ejemplos de métodos HTTP -->
+        <div class="space-y-6 mb-8">
+            
+            <!-- GET -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <div class="font-mono text-lg mb-2">
+                    <span class="text-green-400 font-semibold">GET</span>
+                    <span class="text-blue-400 mx-2">/api/users/123</span>
+                    <span class="text-yellow-400">Obtener información de usuario</span>
+                </div>
+            </div>
+            
+            <!-- POST -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <div class="font-mono text-lg mb-2">
+                    <span class="text-green-400 font-semibold">POST</span>
+                    <span class="text-blue-400 mx-2">/api/users</span>
+                    <span class="text-yellow-400">Crear nuevo usuario</span>
+                </div>
+            </div>
+            
+            <!-- PUT -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <div class="font-mono text-lg mb-2">
+                    <span class="text-green-400 font-semibold">PUT</span>
+                    <span class="text-blue-400 mx-2">/api/users/123</span>
+                    <span class="text-yellow-400">Actualizar usuario completo</span>
+                </div>
+            </div>
+            
+            <!-- PATCH -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <div class="font-mono text-lg mb-2">
+                    <span class="text-green-400 font-semibold">PATCH</span>
+                    <span class="text-blue-400 mx-2">/api/users/123</span>
+                    <span class="text-yellow-400">Actualizar parcialmente</span>
+                </div>
+            </div>
+            
+            <!-- DELETE -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <div class="font-mono text-lg mb-2">
+                    <span class="text-green-400 font-semibold">DELETE</span>
+                    <span class="text-blue-400 mx-2">/api/users/123</span>
+                    <span class="text-yellow-400">Eliminar usuario</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Leyenda -->
+        <div class="flex flex-wrap gap-6 mb-8">
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-green-400 rounded-full mr-2"></div>
+                <span class="text-gray-300 text-sm">Método HTTP</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-blue-400 rounded-full mr-2"></div>
+                <span class="text-gray-300 text-sm">Endpoint/Recurso</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-yellow-400 rounded-full mr-2"></div>
+                <span class="text-gray-300 text-sm">Descripción de la acción</span>
+            </div>
+        </div>
+        
+        <!-- Sección adicional -->
+        <div class="border-t border-gray-700 pt-8">
+            <h2 class="text-gray-400 text-xl mb-6">💡 Códigos de respuesta comunes:</h2>
+            
+            <div class="space-y-4">
+                <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                    <div class="font-mono text-lg">
+                        <span class="text-green-400 font-semibold">200</span>
+                        <span class="text-gray-300 mx-2">:</span>
+                        <span class="text-yellow-400">Operación exitosa</span>
+                        <span class="text-gray-400 ml-4">• Solicitud procesada correctamente</span>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                    <div class="font-mono text-lg">
+                        <span class="text-green-400 font-semibold">404</span>
+                        <span class="text-gray-300 mx-2">:</span>
+                        <span class="text-yellow-400">Recurso no encontrado</span>
+                        <span class="text-gray-400 ml-4">• El endpoint o recurso no existe</span>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                    <div class="font-mono text-lg">
+                        <span class="text-green-400 font-semibold">500</span>
+                        <span class="text-gray-300 mx-2">:</span>
+                        <span class="text-yellow-400">Error del servidor</span>
+                        <span class="text-gray-400 ml-4">• Problema interno en el servidor</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="mt-12 text-center">
+            <div class="inline-flex items-center bg-gray-800 border border-gray-600 text-gray-300 px-4 py-2 rounded-lg text-sm">
+                🌐 Fundamentos de APIs REST
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>

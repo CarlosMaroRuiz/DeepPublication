@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Primer Bug de Programación</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 flex items-center justify-center p-8">
+    <!-- Dato curioso: El término "bug" en programación proviene de un insecto real encontrado por Grace Hopper en 1947 -->
+    
+    <div class="relative max-w-lg w-full">
+        <!-- Sombra del contenedor -->
+        <div class="absolute inset-0 bg-black/20 rounded-3xl translate-x-2 translate-y-2"></div>
+        
+        <!-- Contenedor principal -->
+        <div class="relative bg-yellow-50 rounded-3xl p-8 border-4 border-gray-800 shadow-2xl transform hover:scale-105 transition-transform duration-300">
+            <!-- Comillas superiores -->
+            <div class="absolute -top-4 -left-4 text-6xl font-bold text-gray-800 leading-none">"</div>
+            
+            <!-- Contenido principal -->
+            <div class="pt-6 pb-4">
+                <h1 class="text-2xl md:text-3xl font-black text-gray-800 leading-tight text-center uppercase tracking-wide">
+                    El primer<br>
+                    <span class="text-yellow-600">"bug"</span><br>
+                    de programación<br>
+                    fue una<br>
+                    polilla real
+                </h1>
+            </div>
+            
+            <!-- Comillas inferiores -->
+            <div class="absolute -bottom-4 -right-4 text-6xl font-bold text-gray-800 leading-none rotate-180">"</div>
+        </div>
+        
+        <!-- Elemento decorativo -->
+        <div class="absolute -top-6 -right-6 w-12 h-12 bg-yellow-300 rounded-full opacity-70 animate-pulse"></div>
+        <div class="absolute -bottom-8 -left-8 w-8 h-8 bg-yellow-600 rounded-full opacity-50"></div>
+    </div>
+    
+    <!-- Dato curioso visible al pasar el mouse -->
+    <div class="fixed bottom-4 left-4 bg-gray-800 text-yellow-300 px-4 py-2 rounded-lg text-sm opacity-0 hover:opacity-100 transition-opacity duration-300 max-w-xs">
+        🐛 <strong>Dato histórico:</strong> En 1947, Grace Hopper encontró una polilla atrapada en el Harvard Mark II. La pegó en su cuaderno y escribió "primer caso real de bug encontrado".
+    </div>
+    
+    <!-- Información adicional -->
+    <div class="fixed bottom-4 right-4 text-gray-700 text-xs opacity-60">
+        Historia de la programación • HTML + Tailwind CSS
+    </div>
+</body>
+</html>

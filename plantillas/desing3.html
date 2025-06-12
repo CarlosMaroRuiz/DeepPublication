@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propiedades ACID</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-500 flex items-center justify-center p-6">
+    
+    <!-- Contenedor principal -->
+    <div class="max-w-4xl w-full">
+        <!-- Título principal -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl md:text-6xl font-black text-gray-900 leading-tight uppercase tracking-tight">
+                '<span class="text-orange-600">ACID</span>' es un conjunto<br>
+                de propiedades que<br>
+                aseguran la fiabilidad<br>
+                de una transacción en<br>
+                una base de datos.
+            </h1>
+        </div>
+        
+        <!-- Subtítulo -->
+        <div class="text-center mb-12">
+            <p class="text-xl md:text-2xl text-gray-700 font-semibold">
+                Dicho de otra manera...
+            </p>
+        </div>
+        
+        <!-- Grid de propiedades ACID -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Atomicity -->
+            <div class="bg-yellow-300/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-gray-800 shadow-lg hover:scale-105 transition-transform duration-300">
+                <div class="flex items-center mb-3">
+                    <div class="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center text-white font-black text-xl mr-4">
+                        A
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900 uppercase">Atomicity</h3>
+                </div>
+                <p class="text-gray-800 font-semibold text-lg leading-tight">
+                    Todo o nada. La transacción se ejecuta completamente o no se ejecuta.
+                </p>
+            </div>
+            
+            <!-- Consistency -->
+            <div class="bg-yellow-300/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-gray-800 shadow-lg hover:scale-105 transition-transform duration-300">
+                <div class="flex items-center mb-3">
+                    <div class="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center text-white font-black text-xl mr-4">
+                        C
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900 uppercase">Consistency</h3>
+                </div>
+                <p class="text-gray-800 font-semibold text-lg leading-tight">
+                    Los datos siempre mantienen un estado válido y coherente.
+                </p>
+            </div>
+            
+            <!-- Isolation -->
+            <div class="bg-yellow-300/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-gray-800 shadow-lg hover:scale-105 transition-transform duration-300">
+                <div class="flex items-center mb-3">
+                    <div class="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center text-white font-black text-xl mr-4">
+                        I
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900 uppercase">Isolation</h3>
+                </div>
+                <p class="text-gray-800 font-semibold text-lg leading-tight">
+                    Las transacciones no interfieren entre sí durante su ejecución.
+                </p>
+            </div>
+            
+            <!-- Durability -->
+            <div class="bg-yellow-300/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-gray-800 shadow-lg hover:scale-105 transition-transform duration-300">
+                <div class="flex items-center mb-3">
+                    <div class="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center text-white font-black text-xl mr-4">
+                        D
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900 uppercase">Durability</h3>
+                </div>
+                <p class="text-gray-800 font-semibold text-lg leading-tight">
+                    Los cambios confirmados permanecen incluso si hay fallos.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Pie de página -->
+        <div class="text-center mt-12">
+            <div class="inline-flex items-center bg-gray-900 text-yellow-400 px-6 py-3 rounded-full text-sm font-bold">
+                💾 Fundamentos de Bases de Datos
+            </div>
+        </div>
+    </div>
+    
+    <!-- Elementos decorativos -->
+    <div class="absolute top-10 right-10 w-4 h-4 bg-orange-600 rounded-full opacity-60 animate-bounce"></div>
+    <div class="absolute bottom-20 left-16 w-2 h-2 bg-gray-900 rounded-full opacity-40"></div>
+    <div class="absolute top-1/3 left-10 w-3 h-3 bg-orange-500 rounded-full opacity-50 animate-pulse"></div>
+</body>
+</html>

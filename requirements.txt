@@ -1,0 +1,4 @@
+tabulate
+openai
+playwright
+python-dotenv
