@@ -1,4 +1,10 @@
 tabulate
 openai
-playwright
 python-dotenv
+# Flask and web framework dependencies
+Flask==2.3.3
+Flask-SocketIO==5.3.6
+uuid
+# HTML to image conversion
+playwright
+Pillow
