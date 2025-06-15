@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gradient-number {
+            background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .icon-float {
+            animation: iconFloat 4s ease-in-out infinite;
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #3B82F6 0%, #8B5CF6 50%, #EC4899 100%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body class="m-0 p-0 overflow-hidden">
+    <div class="w-[1080px] h-[1080px] bg-gradient-to-br from-blue-50 via-white to-purple-50 p-8 relative">
+        
+        <!-- Elementos decorativos de fondo -->
+        <div class="absolute top-20 right-16 icon-float opacity-30">
+            <div class="text-6xl text-blue-500">🎯</div>
+        </div>
+        
+        <div class="absolute bottom-24 left-20 icon-float opacity-20" style="animation-delay: 2s;">
+            <div class="text-4xl text-purple-500">✨</div>
+        </div>
+        
+        <div class="absolute top-1/2 right-20 icon-float opacity-25" style="animation-delay: 1s;">
+            <div class="text-3xl text-green-500">⚡</div>
+        </div>
+        
+        <!-- Contenedor principal -->
+        <div class="max-w-4xl mx-auto h-full flex flex-col justify-center">
+            
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-full font-bold text-sm mb-6 shadow-lg">
+                    🎯 TOP STRATEGIES
+                </div>
+                
+                <h1 class="text-4xl md:text-5xl font-black text-gray-800 leading-tight mb-4">
+                    5 Hábitos de Developers 
+                    <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        Exitosos
+                    </span>
+                </h1>
+                
+                <p class="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
+                    Estrategias comprobadas que utilizan los programadores más productivos del mundo
+                </p>
+            </div>
+            
+            <!-- Lista de hábitos -->
+            <div class="space-y-6">
+                
+                <!-- Hábito 1 -->
+                <div class="card-hover bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex items-center space-x-6">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <span class="text-2xl font-black text-white">1</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Documentan mientras programan</h3>
+                        <p class="text-gray-600 leading-relaxed">No esperan al final del proyecto. La documentación en tiempo real ahorra 70% del tiempo de mantenimiento.</p>
+                    </div>
+                    <div class="text-3xl opacity-60">📝</div>
+                </div>
+                
+                <!-- Hábito 2 -->
+                <div class="card-hover bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex items-center space-x-6">
+                    <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <span class="text-2xl font-black text-white">2</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Practican coding diario</h3>
+                        <p class="text-gray-600 leading-relaxed">Minimum 30 minutos al día de práctica deliberada. Consistency beats intensity en programación.</p>
+                    </div>
+                    <div class="text-3xl opacity-60">🏋️</div>
+                </div>
+                
+                <!-- Hábito 3 -->
+                <div class="card-hover bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex items-center space-x-6">
+                    <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <span class="text-2xl font-black text-white">3</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Leen código de otros</h3>
+                        <p class="text-gray-600 leading-relaxed">GitHub, open source projects, code reviews. Learning by reading acelera el crecimiento exponencialmente.</p>
+                    </div>
+                    <div class="text-3xl opacity-60">👀</div>
+                </div>
+                
+                <!-- Hábito 4 -->
+                <div class="card-hover bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex items-center space-x-6">
+                    <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <span class="text-2xl font-black text-white">4</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Automatizan tareas repetitivas</h3>
+                        <p class="text-gray-600 leading-relaxed">Scripts, aliases, shortcuts. Si lo haces más de 3 veces, automatízalo. Time is money en tech.</p>
+                    </div>
+                    <div class="text-3xl opacity-60">🤖</div>
+                </div>
+                
+                <!-- Hábito 5 -->
+                <div class="card-hover bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex items-center space-x-6">
+                    <div class="w-16 h-16 bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <span class="text-2xl font-black text-white">5</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Mantienen work-life balance</h3>
+                        <p class="text-gray-600 leading-relaxed">Burnout kills productivity. Los mejores developers saben cuándo descansar y recargar energías.</p>
+                    </div>
+                    <div class="text-3xl opacity-60">⚖️</div>
+                </div>
+                
+            </div>
+            
+            <!-- Call to action -->
+            <div class="text-center mt-12">
+                <div class="inline-flex items-center bg-gray-100 text-gray-700 px-6 py-3 rounded-full text-sm font-medium">
+                    💾 Guarda esta lista • Comparte con tu equipo
+                </div>
+            </div>
+        </div>
+        
+        <!-- Progress indicator decorativo -->
+        <div class="absolute bottom-8 left-8 right-8">
+            <div class="bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div class="progress-bar h-full rounded-full opacity-50" style="width: 100%;"></div>
+            </div>
+        </div>
+        
+        <!-- Badge de credibilidad -->
+        <div class="absolute top-8 right-8 bg-white bg-opacity-90 backdrop-blur-sm rounded-lg px-4 py-2 shadow-lg">
+            <div class="flex items-center space-x-2">
+                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span class="text-gray-700 text-sm font-medium">Verified Tips</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

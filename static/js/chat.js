@@ -8,12 +8,17 @@ let styles = [];
 let colorPalettes = [];
 let chatActive = false;
 let currentUserId = null;
+let premiumTemplates = []; // NUEVO: Plantillas premium cargadas
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     initializeSocket();
     loadInitialData();
     showWelcome();
+    
+    // NUEVO: Cargar plantillas premium y configurar detección de cambios
+    loadPremiumTemplates();
+    setTimeout(setupFormChangeDetection, 1000);
 });
 
 // Socket.IO initialization
@@ -22,12 +27,12 @@ function initializeSocket() {
     
     socket.on('connect', function() {
         console.log('Conectado al servidor');
-        showNotification('Conectado al servidor', 'success');
+        showSmartNotification('Conectado al servidor premium', 'success');
     });
     
     socket.on('disconnect', function() {
         console.log('Desconectado del servidor');
-        showNotification('Desconectado del servidor', 'error');
+        showSmartNotification('Desconectado del servidor', 'error');
     });
     
     socket.on('generation_status', function(data) {
@@ -69,9 +74,15 @@ function initializeSocket() {
                 image: data.image_file
             };
             showResults(data);
-            showNotification('¡Contenido generado exitosamente!', 'success');
+            
+            // MEJORADO: Notificación según tipo de generación
+            const notificationType = data.type === 'premium' ? 'premium' : 'success';
+            const message = data.type === 'premium' ? 
+                '🎉 ¡Contenido premium generado exitosamente!' : 
+                '✅ ¡Contenido generado exitosamente!';
+            showSmartNotification(message, notificationType);
         } else {
-            showNotification(`Error: ${data.error}`, 'error');
+            showSmartNotification(`Error: ${data.error}`, 'error');
         }
     });
     
@@ -95,14 +106,14 @@ function initializeSocket() {
             }
         } else {
             addBotMessage(data.message || 'Hubo un error en la conversación.', ['Reiniciar chat']);
-            showNotification(`Error en chat: ${data.error}`, 'error');
+            showSmartNotification(`Error en chat: ${data.error}`, 'error');
         }
     });
     
     socket.on('chat_reset', function(data) {
         if (data.success) {
             resetChatInterface();
-            showNotification('Chat reiniciado', 'info');
+            showSmartNotification('Chat reiniciado', 'info');
         }
     });
     
@@ -123,19 +134,223 @@ async function loadInitialData() {
         const formatsResponse = await fetch('/api/formats');
         formats = await formatsResponse.json();
         
-        // Load styles
+        // Load styles - MEJORADO: Ahora carga estilos profesionales
         const stylesResponse = await fetch('/api/styles');
         styles = await stylesResponse.json();
         
-        // Load color palettes
+        // Load color palettes - MEJORADO: Ahora carga paletas profesionales
         const palettesResponse = await fetch('/api/color-palettes');
         colorPalettes = await palettesResponse.json();
         
-        console.log('Datos iniciales cargados');
+        console.log('📊 Datos iniciales cargados:', {
+            contentTypes: contentTypes.length,
+            formats: Object.keys(formats).length,
+            styles: styles.length,
+            colorPalettes: colorPalettes.length
+        });
+        
+        showSmartNotification(`🎨 Sistema premium cargado: ${styles.length} estilos y ${colorPalettes.length} paletas`, 'premium');
     } catch (error) {
         console.error('Error cargando datos iniciales:', error);
-        showNotification('Error cargando configuración', 'error');
+        showSmartNotification('Error cargando configuración', 'error');
     }
+}
+
+// NUEVA FUNCIÓN: Cargar plantillas premium disponibles
+async function loadPremiumTemplates() {
+    try {
+        const response = await fetch('/api/templates/premium');
+        const result = await response.json();
+        
+        if (result.success) {
+            premiumTemplates = result.templates;
+            console.log(`✅ ${result.count} plantillas premium cargadas`);
+            showSmartNotification(`👑 ${result.count} plantillas premium disponibles`, 'premium', 3000);
+            return result.templates;
+        }
+    } catch (error) {
+        console.error('Error loading premium templates:', error);
+    }
+    return [];
+}
+
+// NUEVA FUNCIÓN: Obtener recomendaciones inteligentes
+async function getIntelligentRecommendations(params) {
+    try {
+        const response = await fetch('/api/intelligent-recommendations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.recommendations.confidence > 0.5) {
+            // Aplicar recomendaciones automáticamente
+            applyRecommendations(result.recommendations);
+            const confidencePercent = Math.round(result.recommendations.confidence * 100);
+            showSmartNotification(`🎨 Recomendaciones aplicadas automáticamente (${confidencePercent}% confianza)`, 'premium');
+        }
+    } catch (error) {
+        console.error('Error getting recommendations:', error);
+    }
+}
+
+// NUEVA FUNCIÓN: Aplicar recomendaciones automáticamente
+function applyRecommendations(recommendations) {
+    // Auto-seleccionar paleta recomendada
+    if (recommendations.color_palette) {
+        const colorSelect = document.querySelector('select[name="colores"]');
+        if (colorSelect) {
+            // Buscar la opción que coincida
+            for (let option of colorSelect.options) {
+                if (option.value === recommendations.color_palette || option.text.includes(recommendations.color_palette)) {
+                    colorSelect.value = option.value;
+                    // Agregar efecto visual de selección
+                    colorSelect.classList.add('ring-2', 'ring-purple-400');
+                    setTimeout(() => {
+                        colorSelect.classList.remove('ring-2', 'ring-purple-400');
+                    }, 2000);
+                    break;
+                }
+            }
+        }
+    }
+    
+    // Auto-seleccionar estilo recomendado
+    if (recommendations.design_style) {
+        const styleSelect = document.querySelector('select[name="estilo"]');
+        if (styleSelect) {
+            // Buscar la opción que coincida
+            for (let option of styleSelect.options) {
+                if (option.value === recommendations.design_style || option.text.includes(recommendations.design_style)) {
+                    styleSelect.value = option.value;
+                    // Agregar efecto visual de selección
+                    styleSelect.classList.add('ring-2', 'ring-blue-400');
+                    setTimeout(() => {
+                        styleSelect.classList.remove('ring-2', 'ring-blue-400');
+                    }, 2000);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+// NUEVA FUNCIÓN: Preview en tiempo real
+async function generateLivePreview() {
+    const formData = new FormData(document.getElementById('generation-form'));
+    const params = Object.fromEntries(formData.entries());
+    params.content_type = currentContentType;
+
+    try {
+        showSmartNotification('🔍 Generando preview...', 'info', 2000);
+        
+        const response = await fetch('/api/design-preview', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+            showPreviewModal(result.html_preview);
+        } else {
+            showSmartNotification('Error generando preview', 'error');
+        }
+    } catch (error) {
+        console.error('Error generating preview:', error);
+        showSmartNotification('Error en preview', 'error');
+    }
+}
+
+// NUEVA FUNCIÓN: Mostrar modal de preview
+function showPreviewModal(htmlContent) {
+    // Crear modal de preview
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm';
+    modal.innerHTML = `
+        <div class="bg-gray-800 rounded-xl p-6 max-w-5xl w-full mx-4 border border-gray-600 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-eye text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">📱 Preview del Diseño</h3>
+                        <p class="text-gray-400 text-sm">Vista previa de tu contenido</p>
+                    </div>
+                </div>
+                <button onclick="closePreviewModal()" class="text-gray-400 hover:text-white transition-colors p-2">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="bg-white rounded-lg overflow-hidden shadow-inner mb-6">
+                <iframe srcdoc="${htmlContent.replace(/"/g, '&quot;')}" 
+                        class="w-full h-96 border-0"></iframe>
+            </div>
+            
+            <div class="flex justify-center space-x-4">
+                <button onclick="closePreviewModal()" 
+                        class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-medium">
+                    <i class="fas fa-times mr-2"></i>Cerrar Preview
+                </button>
+                <button onclick="generateContent(); closePreviewModal();" 
+                        class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-lg transition-all font-medium shadow-lg">
+                    <i class="fas fa-magic mr-2"></i>¡Generar Versión Final!
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    window.currentPreviewModal = modal;
+}
+
+// NUEVA FUNCIÓN: Cerrar modal de preview
+function closePreviewModal() {
+    if (window.currentPreviewModal) {
+        document.body.removeChild(window.currentPreviewModal);
+        window.currentPreviewModal = null;
+    }
+}
+
+// NUEVA FUNCIÓN: Configurar detección de cambios en formulario
+function setupFormChangeDetection() {
+    const form = document.getElementById('generation-form');
+    if (form) {
+        const temaInput = form.querySelector('input[name="tema"]');
+        if (temaInput) {
+            temaInput.addEventListener('input', debounce(() => {
+                if (currentContentType && temaInput.value.length > 3) {
+                    getIntelligentRecommendations({
+                        content_type: currentContentType,
+                        tema: temaInput.value,
+                        formato: form.querySelector('select[name="formato"]')?.value || 'instagram_square'
+                    });
+                }
+            }, 1000));
+        }
+    }
+}
+
+// NUEVA FUNCIÓN: Utility function para debounce
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }
 
 // Navigation functions
@@ -208,7 +423,7 @@ function loadContentTypesGrid() {
     
     contentTypes.forEach(type => {
         const card = document.createElement('div');
-        card.className = 'bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors cursor-pointer';
+        card.className = 'bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors cursor-pointer hover:scale-105 transform duration-200';
         card.onclick = () => selectContentType(type.id);
         
         card.innerHTML = `
@@ -223,6 +438,7 @@ function loadContentTypesGrid() {
     });
 }
 
+// MODIFICADO: selectContentType con recomendaciones automáticas
 function selectContentType(typeId) {
     currentContentType = typeId;
     const typeInfo = contentTypes.find(t => t.id === typeId);
@@ -231,6 +447,21 @@ function selectContentType(typeId) {
     document.getElementById('content-form').classList.remove('hidden');
     
     generateFormFields(typeId, typeInfo);
+    
+    // NUEVO: Obtener recomendaciones automáticas después de un breve delay
+    setTimeout(() => {
+        const tema = document.querySelector('input[name="tema"]')?.value || '';
+        if (tema.length > 0) {
+            getIntelligentRecommendations({
+                content_type: typeId,
+                tema: tema,
+                formato: 'instagram_square' // default
+            });
+        }
+        
+        // Configurar detección de cambios para este formulario específico
+        setupFormChangeDetection();
+    }, 500);
 }
 
 function backToContentTypes() {
@@ -239,6 +470,7 @@ function backToContentTypes() {
     currentContentType = null;
 }
 
+// MODIFICADO: generateFormFields con botón de preview
 function generateFormFields(typeId, typeInfo) {
     const formFields = document.getElementById('form-fields');
     formFields.innerHTML = '';
@@ -248,6 +480,7 @@ function generateFormFields(typeId, typeInfo) {
     titleDiv.innerHTML = `
         <h3 class="text-xl font-bold mb-6 flex items-center">
             ${typeInfo.emoji} Configurando: ${typeInfo.name}
+            <span class="ml-3 bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">PREMIUM</span>
         </h3>
     `;
     formFields.appendChild(titleDiv);
@@ -260,12 +493,12 @@ function generateFormFields(typeId, typeInfo) {
     const specificFields = getContentSpecificFields(typeId);
     specificFields.forEach(field => formFields.appendChild(field));
     
-    // Visual style
-    const styleField = createSelectField('estilo', '🎨 Estilo Visual', styles);
+    // Visual style - MEJORADO: Muestra información adicional
+    const styleField = createSelectFieldEnhanced('estilo', '🎨 Estilo Visual', styles, 'description');
     formFields.appendChild(styleField);
     
-    // Color palette
-    const colorField = createSelectField('colores', '🌈 Paleta de Colores', colorPalettes);
+    // Color palette - MEJORADO: Muestra información adicional
+    const colorField = createSelectFieldEnhanced('colores', '🌈 Paleta de Colores', colorPalettes, 'description');
     formFields.appendChild(colorField);
     
     // Social format
@@ -278,6 +511,26 @@ function generateFormFields(typeId, typeInfo) {
     // Filename
     const filenameField = createInputField('nombre_archivo', 'text', '💾 Nombre del archivo', 'sin extensión');
     formFields.appendChild(filenameField);
+    
+    // NUEVO: Botones mejorados con preview
+    const buttonsDiv = document.createElement('div');
+    buttonsDiv.className = 'flex flex-wrap gap-4';
+    buttonsDiv.innerHTML = `
+        <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-3 px-6 rounded-lg transition-all shadow-lg">
+            <i class="fas fa-magic mr-2"></i>
+            Generar Contenido Premium
+        </button>
+        <button type="button" onclick="generateLivePreview()" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+            <i class="fas fa-eye mr-2"></i>
+            Preview Rápido
+        </button>
+        <button type="button" onclick="generateRandomIdea()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+            <i class="fas fa-dice mr-2"></i>
+            Idea Aleatoria
+        </button>
+    `;
+    
+    formFields.appendChild(buttonsDiv);
 }
 
 function getContentSpecificFields(typeId) {
@@ -347,7 +600,7 @@ function createInputField(name, type, label, placeholder = '', required = false,
             ${label} ${req}
         </label>
         <input type="${type}" name="${name}" placeholder="${placeholder}" 
-               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-white placeholder-gray-400"
+               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-white placeholder-gray-400 transition-all"
                ${required ? 'required' : ''} ${attrStr}>
     `;
     
@@ -363,7 +616,7 @@ function createTextareaField(name, label, placeholder = '', required = false) {
             ${label} ${req}
         </label>
         <textarea name="${name}" placeholder="${placeholder}" rows="3"
-                  class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-white placeholder-gray-400"
+                  class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-white placeholder-gray-400 transition-all"
                   ${required ? 'required' : ''}></textarea>
     `;
     
@@ -381,7 +634,34 @@ function createSelectField(name, label, options, values = null) {
     
     div.innerHTML = `
         <label class="block text-sm font-medium text-gray-300 mb-2">${label}</label>
-        <select name="${name}" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-white">
+        <select name="${name}" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-white transition-all">
+            ${optionsHtml}
+        </select>
+    `;
+    
+    return div;
+}
+
+// NUEVA FUNCIÓN: Select field mejorado con descripciones
+function createSelectFieldEnhanced(name, label, options, descriptionKey) {
+    const div = document.createElement('div');
+    
+    let optionsHtml = '';
+    options.forEach((option) => {
+        const displayName = option.name || option;
+        const description = option[descriptionKey] || '';
+        const value = option.id || option.name || option;
+        
+        const optionText = description ? `${displayName} - ${description}` : displayName;
+        optionsHtml += `<option value="${value}" title="${description}">${optionText}</option>`;
+    });
+    
+    div.innerHTML = `
+        <label class="block text-sm font-medium text-gray-300 mb-2">
+            ${label}
+            <span class="text-purple-400 text-xs ml-2">✨ Premium</span>
+        </label>
+        <select name="${name}" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-transparent text-white transition-all">
             ${optionsHtml}
         </select>
     `;
@@ -423,7 +703,7 @@ function generateContent() {
     }
     
     // Show generation status
-    showGenerationStatus('🚀 Iniciando generación...');
+    showGenerationStatus('🚀 Iniciando generación premium...');
     
     // Send to server via Socket.IO
     socket.emit('generate_content', params);
@@ -508,9 +788,9 @@ function showResults(data) {
     
     // Update file details
     const fileDetails = document.getElementById('file-details');
-    const typeText = data.type === 'premium' ? 'Generado con IA' : 'Generado con plantilla';
-    const typeColor = data.type === 'premium' ? 'text-blue-400' : 'text-yellow-400';
-    const typeIcon = data.type === 'premium' ? 'fas fa-brain' : 'fas fa-template';
+    const typeText = data.type === 'premium' ? 'Generado con IA Premium' : 'Generado con plantilla';
+    const typeColor = data.type === 'premium' ? 'text-purple-400' : 'text-yellow-400';
+    const typeIcon = data.type === 'premium' ? 'fas fa-crown' : 'fas fa-template';
     
     fileDetails.innerHTML = `
         <div class="flex items-center justify-between">
@@ -585,14 +865,14 @@ function closeResultsModal() {
 function downloadHTML() {
     if (generatedFiles && generatedFiles.html) {
         window.open(`/download/${generatedFiles.html}`, '_blank');
-        showNotification('Descargando archivo HTML...', 'info');
+        showSmartNotification('Descargando archivo HTML...', 'info');
     }
 }
 
 function downloadImage() {
     if (generatedFiles && generatedFiles.image) {
         window.open(`/download/${generatedFiles.image}`, '_blank');
-        showNotification('Descargando imagen...', 'info');
+        showSmartNotification('Descargando imagen...', 'info');
     }
 }
 
@@ -620,27 +900,27 @@ function shareOnSocial() {
 function fallbackShare(url) {
     // Copy to clipboard as fallback
     navigator.clipboard.writeText(url).then(() => {
-        showNotification('URL copiada al portapapeles', 'success');
+        showSmartNotification('URL copiada al portapapeles', 'success');
     }).catch(() => {
-        showNotification('No se pudo compartir automáticamente', 'warning');
+        showSmartNotification('No se pudo compartir automáticamente', 'warning');
     });
 }
 
 function generateVariation() {
-    showNotification('Función de variaciones próximamente...', 'info');
+    showSmartNotification('Función de variaciones próximamente...', 'tip');
     // TODO: Implement variation generation
 }
 
 function createNew() {
     closeResultsModal();
     showContentTypes();
-    showNotification('¿Listo para crear otro post increíble?', 'info');
+    showSmartNotification('¿Listo para crear otro post increíble?', 'info');
 }
 
 // Random idea generation
 async function generateRandomIdea() {
     try {
-        showNotification('Generando idea aleatoria...', 'info');
+        showSmartNotification('Generando idea aleatoria...', 'info');
         
         const response = await fetch('/api/random-ideas');
         const ideas = await response.json();
@@ -649,11 +929,11 @@ async function generateRandomIdea() {
             const randomIdea = ideas[Math.floor(Math.random() * ideas.length)];
             showIdeaModal(randomIdea);
         } else {
-            showNotification('No se pudieron cargar ideas', 'error');
+            showSmartNotification('No se pudieron cargar ideas', 'error');
         }
     } catch (error) {
         console.error('Error generating random idea:', error);
-        showNotification('Error generando idea aleatoria', 'error');
+        showSmartNotification('Error generando idea aleatoria', 'error');
     }
 }
 
@@ -720,7 +1000,7 @@ function useIdea(contentType, tema, titulo) {
         const tituloField = document.querySelector('input[name="titulo"]');
         if (tituloField) tituloField.value = titulo;
         
-        showNotification('Idea aplicada al formulario', 'success');
+        showSmartNotification('Idea aplicada al formulario', 'success');
     }, 100);
 }
 
@@ -751,47 +1031,84 @@ async function testDeepSeek() {
                 <div class="text-green-400">✅ ${result.message}</div>
                 <div class="text-gray-400 mt-1">Respuesta: ${result.response}</div>
             `;
-            showNotification('Conexión DeepSeek exitosa', 'success');
+            showSmartNotification('Conexión DeepSeek exitosa', 'success');
         } else {
             statusDiv.innerHTML = `
                 <div class="text-red-400">❌ ${result.message}</div>
                 <div class="text-gray-400 mt-1">Error: ${result.error}</div>
             `;
-            showNotification('Error en conexión DeepSeek', 'error');
+            showSmartNotification('Error en conexión DeepSeek', 'error');
         }
     } catch (error) {
         statusDiv.innerHTML = `<div class="text-red-400">❌ Error de conexión: ${error.message}</div>`;
-        showNotification('Error probando DeepSeek', 'error');
+        showSmartNotification('Error probando DeepSeek', 'error');
     }
 }
 
-// Notification system
-function showNotification(message, type = 'info') {
+// MEJORADO: Sistema de notificaciones inteligente
+function showSmartNotification(message, type = 'info', duration = 5000) {
     const notification = document.getElementById('notification');
     const icon = document.getElementById('notification-icon');
     const messageSpan = document.getElementById('notification-message');
     
-    // Set icon and colors based on type
+    // Configuración mejorada
     const config = {
-        success: { icon: 'fa-check-circle', bgColor: 'bg-green-600', textColor: 'text-white' },
-        error: { icon: 'fa-exclamation-circle', bgColor: 'bg-red-600', textColor: 'text-white' },
-        info: { icon: 'fa-info-circle', bgColor: 'bg-blue-600', textColor: 'text-white' },
-        warning: { icon: 'fa-exclamation-triangle', bgColor: 'bg-yellow-600', textColor: 'text-white' }
+        success: { 
+            icon: 'fa-check-circle', 
+            bgColor: 'bg-green-600', 
+            textColor: 'text-white',
+            emoji: '✅'
+        },
+        error: { 
+            icon: 'fa-exclamation-circle', 
+            bgColor: 'bg-red-600', 
+            textColor: 'text-white',
+            emoji: '❌'
+        },
+        info: { 
+            icon: 'fa-info-circle', 
+            bgColor: 'bg-blue-600', 
+            textColor: 'text-white',
+            emoji: 'ℹ️'
+        },
+        warning: { 
+            icon: 'fa-exclamation-triangle', 
+            bgColor: 'bg-yellow-600', 
+            textColor: 'text-white',
+            emoji: '⚠️'
+        },
+        tip: { 
+            icon: 'fa-lightbulb', 
+            bgColor: 'bg-yellow-600', 
+            textColor: 'text-white',
+            emoji: '💡'
+        },
+        premium: { 
+            icon: 'fa-crown', 
+            bgColor: 'bg-gradient-to-r from-purple-600 to-pink-600', 
+            textColor: 'text-white',
+            emoji: '👑'
+        }
     };
     
     const notificationConfig = config[type] || config.info;
     
     icon.className = `fas ${notificationConfig.icon}`;
     notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg transition-transform z-50 ${notificationConfig.bgColor} ${notificationConfig.textColor}`;
-    messageSpan.textContent = message;
+    messageSpan.innerHTML = `${notificationConfig.emoji} ${message}`;
     
-    // Show notification
+    // Mostrar notificación
     notification.style.transform = 'translateX(0)';
     
-    // Hide after 5 seconds
+    // Ocultar después del tiempo especificado
     setTimeout(() => {
         notification.style.transform = 'translateX(100%)';
-    }, 5000);
+    }, duration);
+}
+
+// Mantener compatibilidad con la función anterior
+function showNotification(message, type = 'info') {
+    showSmartNotification(message, type);
 }
 
 // ================================
@@ -860,7 +1177,7 @@ function sendChatMessage() {
     const message = input.value.trim();
     
     if (!message) {
-        showNotification('Por favor escribe algo', 'warning');
+        showSmartNotification('Por favor escribe algo', 'warning');
         return;
     }
     

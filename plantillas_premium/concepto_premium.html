@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concepto Técnico Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace; }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .tech-grid {
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .code-block {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+    </style>
+</head>
+<body class="m-0 p-0 overflow-hidden">
+    <div class="w-[1080px] h-[1080px] relative bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 tech-grid">
+        
+        <!-- Elementos flotantes decorativos -->
+        <div class="absolute top-16 right-20 floating" style="animation-delay: 0s;">
+            <div class="w-20 h-20 rounded-xl bg-blue-500 bg-opacity-20 flex items-center justify-center">
+                <span class="text-3xl">⚡</span>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-20 left-16 floating" style="animation-delay: 2s;">
+            <div class="w-16 h-16 rounded-lg bg-purple-500 bg-opacity-20 flex items-center justify-center">
+                <span class="text-2xl">🧠</span>
+            </div>
+        </div>
+        
+        <div class="absolute top-1/3 left-12 floating" style="animation-delay: 4s;">
+            <div class="w-12 h-12 rounded-full bg-indigo-500 bg-opacity-20 flex items-center justify-center">
+                <span class="text-xl">💻</span>
+            </div>
+        </div>
+        
+        <!-- Contenedor principal -->
+        <div class="h-full flex items-center justify-center p-8">
+            <div class="max-w-4xl w-full space-y-8">
+                
+                <!-- Header con badge de nivel -->
+                <div class="text-center space-y-4">
+                    <div class="inline-flex items-center space-x-2 glass-effect rounded-full px-6 py-3">
+                        <span class="text-2xl">🚀</span>
+                        <span class="text-white font-bold text-sm">INTERMEDIATE LEVEL</span>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-bold px-4 py-2 rounded-full inline-block">
+                        🧠 CONCEPTO TÉCNICO
+                    </div>
+                </div>
+                
+                <!-- Título principal -->
+                <div class="text-center">
+                    <h1 class="text-5xl md:text-6xl font-black gradient-text leading-tight mb-4">
+                        Clean Architecture
+                    </h1>
+                    <p class="text-xl text-gray-300 leading-relaxed max-w-3xl mx-auto">
+                        Un patrón arquitectónico que separa el código en capas con dependencias que 
+                        apuntan hacia el centro, manteniendo la lógica de negocio independiente.
+                    </p>
+                </div>
+                
+                <!-- Estructura visual del concepto -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- Capa Externa -->
+                    <div class="glass-effect rounded-2xl p-6 text-center">
+                        <div class="w-16 h-16 bg-red-500 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">🌐</span>
+                        </div>
+                        <h3 class="text-white font-bold mb-2">UI/External</h3>
+                        <p class="text-gray-400 text-sm">Frameworks, DB, APIs externas</p>
+                    </div>
+                    
+                    <!-- Capa Intermedia -->
+                    <div class="glass-effect rounded-2xl p-6 text-center">
+                        <div class="w-16 h-16 bg-yellow-500 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">⚙️</span>
+                        </div>
+                        <h3 class="text-white font-bold mb-2">Use Cases</h3>
+                        <p class="text-gray-400 text-sm">Casos de uso específicos</p>
+                    </div>
+                    
+                    <!-- Núcleo -->
+                    <div class="glass-effect rounded-2xl p-6 text-center border-2 border-blue-500 border-opacity-50">
+                        <div class="w-16 h-16 bg-blue-500 bg-opacity-30 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-2xl">💎</span>
+                        </div>
+                        <h3 class="text-blue-400 font-bold mb-2">Business Logic</h3>
+                        <p class="text-gray-400 text-sm">Reglas de negocio puras</p>
+                    </div>
+                </div>
+                
+                <!-- Ejemplo de código -->
+                <div class="code-block rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-blue-400 font-semibold text-sm">💻 EJEMPLO PRÁCTICO</span>
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="code-font text-gray-300 text-sm space-y-2">
+                        <div><span class="text-purple-400">interface</span> <span class="text-blue-400">UserRepository</span> {</div>
+                        <div class="ml-4"><span class="text-green-400">save</span>(<span class="text-orange-400">user</span>: User): <span class="text-blue-400">Promise</span>&lt;<span class="text-blue-400">void</span>&gt;</div>
+                        <div>}</div>
+                        <div class="mt-4"><span class="text-gray-500">// ✅ Business logic no depende de detalles</span></div>
+                    </div>
+                </div>
+                
+                <!-- Beneficios clave -->
+                <div class="flex justify-center space-x-8">
+                    <div class="text-center">
+                        <div class="text-green-400 text-2xl font-bold">✓</div>
+                        <div class="text-white text-sm font-medium">Testeable</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-green-400 text-2xl font-bold">✓</div>
+                        <div class="text-white text-sm font-medium">Mantenible</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-green-400 text-2xl font-bold">✓</div>
+                        <div class="text-white text-sm font-medium">Escalable</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer con hashtags -->
+        <div class="absolute bottom-6 left-8 text-gray-400 text-sm">
+            #CleanArchitecture #SoftwareDesign #Development
+        </div>
+        
+        <!-- Indicador de complejidad -->
+        <div class="absolute top-6 right-8 glass-effect rounded-lg px-4 py-2">
+            <div class="flex items-center space-x-2">
+                <div class="flex space-x-1">
+                    <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div class="w-2 h-2 bg-gray-600 rounded-full"></div>
+                </div>
+                <span class="text-white text-xs font-medium">Intermediate</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

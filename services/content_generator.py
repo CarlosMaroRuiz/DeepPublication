@@ -13,6 +13,7 @@ class ContentGeneratorService:
         self.reasoner = DeepSeekReseaoner()
         self.html_converter = HTMLConverterService()
         self.templates_folder = "./plantillas"
+        self.premium_templates_folder = "./plantillas_premium"
         
     def test_deepseek_connection(self):
         """Prueba la conexión con DeepSeek"""
@@ -75,13 +76,89 @@ class ContentGeneratorService:
                 'error': str(e)
             }
     
+    def get_intelligent_recommendations(self, params):
+        """Obtiene recomendaciones basadas en IA y contexto"""
+        try:
+            content_type = params.get('content_type', 'tip')
+            tema = params.get('tema', '')
+            formato = params.get('formato', 'instagram_square')
+            
+            # Detectar industria automáticamente
+            industry_keywords = {
+                'tech': ['programación', 'desarrollo', 'código', 'software', 'tech', 'ia', 'inteligencia artificial'],
+                'finance': ['finanzas', 'inversión', 'dinero', 'banco', 'crypto', 'trading'],
+                'creative': ['diseño', 'arte', 'creatividad', 'marketing', 'branding'],
+                'healthcare': ['salud', 'medicina', 'bienestar', 'fitness', 'nutrición'],
+                'education': ['educación', 'aprendizaje', 'curso', 'tutorial', 'enseñanza'],
+                'business': ['negocio', 'empresa', 'emprendimiento', 'startup', 'ventas']
+            }
+            
+            detected_industry = 'general'
+            for industry, keywords in industry_keywords.items():
+                if any(keyword in tema.lower() for keyword in keywords):
+                    detected_industry = industry
+                    break
+            
+            # Mapeo de recomendaciones
+            industry_recommendations = {
+                'tech': {
+                    'color_palette': 'Verde tech',
+                    'design_style': 'Moderno',
+                    'confidence': 0.8
+                },
+                'finance': {
+                    'color_palette': 'Azul profesional',
+                    'design_style': 'Profesional',
+                    'confidence': 0.9
+                },
+                'creative': {
+                    'color_palette': 'Púrpura moderno',
+                    'design_style': 'Colorido',
+                    'confidence': 0.8
+                },
+                'healthcare': {
+                    'color_palette': 'Verde tech',
+                    'design_style': 'Minimalista',
+                    'confidence': 0.7
+                },
+                'business': {
+                    'color_palette': 'Azul profesional',
+                    'design_style': 'Profesional',
+                    'confidence': 0.8
+                }
+            }
+            
+            recommendations = industry_recommendations.get(detected_industry, {
+                'color_palette': 'Azul profesional',
+                'design_style': 'Moderno',
+                'confidence': 0.5
+            })
+            
+            # Ajustes específicos por plataforma
+            if formato == 'linkedin_post':
+                recommendations['design_style'] = 'Profesional'
+                recommendations['confidence'] += 0.1
+            elif formato == 'instagram_square':
+                recommendations['design_style'] = 'Colorido'
+                recommendations['confidence'] += 0.1
+            
+            return recommendations
+            
+        except Exception as e:
+            return {
+                'color_palette': 'Azul profesional',
+                'design_style': 'Moderno',
+                'confidence': 0.3,
+                'error': str(e)
+            }
+    
     async def generate_content_async(self, params, socketio=None):
         """Genera contenido de forma asíncrona con actualización en tiempo real"""
         try:
             if socketio:
                 socketio.emit('generation_status', {
                     'status': 'loading_templates',
-                    'message': '📁 Cargando plantillas...'
+                    'message': '📁 Cargando plantillas premium...'
                 })
             
             templates = self.load_templates()
@@ -89,7 +166,7 @@ class ContentGeneratorService:
             if socketio:
                 socketio.emit('generation_status', {
                     'status': 'creating_prompts',
-                    'message': f'🛠️ Creando prompts... ({len(templates)} plantillas cargadas)'
+                    'message': f'🛠️ Creando prompts profesionales... ({len(templates)} plantillas cargadas)'
                 })
             
             system_prompt = self.create_system_prompt()
@@ -203,7 +280,7 @@ class ContentGeneratorService:
             if socketio:
                 socketio.emit('generation_status', {
                     'status': 'fallback',
-                    'message': '🛡️ Usando modo fallback...'
+                    'message': '🛡️ Usando modo fallback premium...'
                 })
             
             dimensions = SOCIAL_DIMENSIONS[params['formato']]
@@ -255,118 +332,382 @@ class ContentGeneratorService:
         return html_content
     
     def load_templates(self):
-        """Carga plantillas HTML"""
+        """Carga plantillas HTML premium y básicas"""
         templates = []
-        folder_path = Path(self.templates_folder)
         
-        if not folder_path.exists():
-            return templates
+        # Cargar plantillas premium primero (mayor prioridad)
+        premium_folder = Path(self.premium_templates_folder)
+        basic_folder = Path(self.templates_folder)
         
-        for html_file in folder_path.glob("*.html"):
-            try:
-                with open(html_file, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    templates.append({
-                        'filename': html_file.name,
-                        'content': content[:600]  # Reducir tamaño
-                    })
-            except Exception as e:
-                print(f"⚠️ Error leyendo {html_file}: {e}")
+        for folder_info in [
+            (premium_folder, 'premium'), 
+            (basic_folder, 'basic')
+        ]:
+            folder_path, folder_type = folder_info
+            
+            if folder_path.exists():
+                for html_file in folder_path.glob("*.html"):
+                    try:
+                        with open(html_file, 'r', encoding='utf-8') as f:
+                            content = f.read()
+                            templates.append({
+                                'filename': html_file.name,
+                                'type': folder_type,
+                                'content': content[:800]  # Más contenido para mejor contexto
+                            })
+                    except Exception as e:
+                        print(f"⚠️ Error leyendo {html_file}: {e}")
+        
+        # Si no hay plantillas premium, usar solo las básicas
+        if not templates:
+            print("⚠️ No se encontraron plantillas premium, usando básicas")
         
         return templates
     
     def create_system_prompt(self):
-        """System prompt específico para contenido social"""
-        return """Eres un experto en creación de contenido visual para redes sociales que genera código HTML válido.
+        """System prompt mejorado para diseños profesionales"""
+        return """Eres un DIRECTOR CREATIVO SENIOR de una agencia premium especializada en contenido social para Fortune 500.
 
-TAREA PRINCIPAL:
-Generar código HTML completo y funcional para posts de redes sociales.
+MISIÓN: Crear diseños que compitan con Apple, Stripe, Airbnb y Tesla en calidad visual.
 
-ESPECIALIZACIÓN:
-- Posts atractivos para Instagram, LinkedIn, Twitter
-- Diseños que generen engagement y shares
-- Contenido profesional pero accesible
-- Tipografía legible en dispositivos móviles
-- Explicaciones técnicas simplificadas y visuales
+ESTÁNDARES PREMIUM OBLIGATORIOS:
+🎨 DISEÑO:
+- Minimalismo inteligente (espacio en blanco = lujo)
+- Jerarquía visual perfecta (título → subtítulo → cuerpo → CTA)
+- Paletas armoniosas (máximo 3 colores + neutros)
+- Tipografía moderna (Inter, SF Pro, system-ui)
+- Elementos alineados a grilla invisible
+
+⚡ TÉCNICO:
+- Responsive perfecto (móvil first)
+- Accesibilidad WCAG AA (contraste 4.5:1+)
+- Microinteracciones sutiles (hover, focus)
+- Optimización para screenshot/sharing
+
+🎯 PSICOLOGÍA VISUAL:
+- Escaneabilidad en 3 segundos
+- Jerarquía de información clara
+- Llamada a acción evidente
+- Credibilidad través diseño
+
+INSPIRACIÓN DIRECTA:
+- Apple.com marketing pages
+- Stripe.com landing sections  
+- Linear.app visual style
+- Figma community top designs
+- Dribbble shots with 10k+ likes
 
 PROCESO OBLIGATORIO:
-1. Analiza las plantillas de diseño proporcionadas
-2. Combina elementos para crear contenido único
-3. Adapta el diseño al formato de red social específico
-4. Para conceptos: usa analogías visuales y ejemplos claros
+1. Analizar brief → Definir objetivo visual
+2. Seleccionar paleta estratégica → Crear jerarquía tipográfica
+3. Estructurar layout responsive → Añadir elementos premium
+4. Pulir detalles microinteracciones → Validar legibilidad
 
-REGLAS TÉCNICAS ESTRICTAS:
-- Responde ÚNICAMENTE con código HTML válido y completo
-- Usa EXCLUSIVAMENTE Tailwind CSS (CDN)
-- Incluye DOCTYPE html, head completo y body
-- Diseño centrado y equilibrado
-- Tipografía grande y legible
-- Sin JavaScript
-- Sin imágenes externas
-- Optimizado para la red social especificada
-- NO incluir explicaciones antes o después del HTML
-- NO usar markdown o comentarios fuera del HTML
+RESPUESTA REQUERIDA:
+- HTML completo válido (DOCTYPE + estructura)
+- Tailwind CSS exclusivamente
+- Fonts Google (Inter, Poppins, Roboto) 
+- Sin JavaScript ni imágenes externas
+- Dimensiones exactas especificadas
+- Sin explicaciones, SOLO código HTML
 
-FORMATO DE RESPUESTA OBLIGATORIO:
-- Primera línea: <!DOCTYPE html>
-- Última línea: </html>
-- Sin texto adicional antes o después del HTML
-- Sin bloques de código markdown (```)
+CALIDAD TARGET: Indistinguible de trabajo de agencia $500/hora."""
 
-IMPORTANTE: Tu respuesta debe ser HTML puro, sin explicaciones."""
-    
     def create_content_prompt(self, templates, params):
-        """Prompt específico para contenido social"""
+        """Prompt específico mejorado para contenido social"""
         dimensions = SOCIAL_DIMENSIONS[params['formato']]
         
-        # Solo usar 1 plantilla para reducir tamaño del prompt
-        template_content = ""
+        # Sistema de paletas profesionales
+        color_schemes = {
+            "Azul profesional": {
+                "primary": "#1E40AF", "secondary": "#3B82F6", "accent": "#60A5FA",
+                "background": "#F8FAFC", "text": "#1E293B", "description": "Confianza corporativa"
+            },
+            "Verde tech": {
+                "primary": "#059669", "secondary": "#10B981", "accent": "#34D399", 
+                "background": "#F0FDF4", "text": "#064E3B", "description": "Innovación sostenible"
+            },
+            "Púrpura moderno": {
+                "primary": "#7C3AED", "secondary": "#A855F7", "accent": "#C084FC",
+                "background": "#FAF5FF", "text": "#581C87", "description": "Creatividad premium"
+            },
+            "Naranja energético": {
+                "primary": "#EA580C", "secondary": "#FB923C", "accent": "#FDBA74",
+                "background": "#FFF7ED", "text": "#9A3412", "description": "Energía positiva"
+            },
+            "Gradiente sunset": {
+                "primary": "#EC4899", "secondary": "#F59E0B", "accent": "#EF4444",
+                "background": "linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)", "text": "#92400E", "description": "Warmth premium"
+            },
+            "Monocromático": {
+                "primary": "#111827", "secondary": "#374151", "accent": "#6B7280",
+                "background": "#F9FAFB", "text": "#111827", "description": "Elegancia atemporal"
+            }
+        }
+        
+        selected_scheme = color_schemes.get(params['colores'], color_schemes["Azul profesional"])
+        
+        # Plantillas de diseño específicas por tipo
+        design_templates = {
+            "tip": """
+            DISEÑO TIP PROFESIONAL:
+            - Header con badge "💡 PROFESSIONAL TIP"
+            - Título principal en 32-40px, bold, color primary
+            - Descripción en 18-20px, line-height 1.6
+            - Card con sombra sutil y border radius 16px
+            - Ícono/emoji de acento
+            - Footer con branding sutil
+            """,
+            "quote": """
+            DISEÑO QUOTE PREMIUM:
+            - Comillas grandes como elemento decorativo (color accent, opacity 0.3)
+            - Texto de la cita en 24-28px, italic, centrado
+            - Autor en 16px, color secondary, bold
+            - Fondo con gradiente sutil o patrón minimalista
+            - Layout centrado verticalmente
+            """,
+            "estadistica": """
+            DISEÑO ESTADÍSTICA IMPACTANTE:
+            - Número principal en 48-64px, ultra-bold, color primary
+            - Porcentaje/unidad en color accent
+            - Descripción en 20px, color text, weight 500
+            - Gráfico visual simple (barra, círculo)
+            - Badge "📊 DATA INSIGHT"
+            - Background con pattern sutil
+            """,
+            "concepto": """
+            DISEÑO CONCEPTO TÉCNICO:
+            - Header con nivel de dificultad (badges)
+            - Concepto principal en 28-32px, gradient text
+            - Explicación en párrafos bien espaciados
+            - Ejemplo en código box (si aplica)
+            - Iconografía tech moderna
+            - Layout en cards o sections
+            """,
+            "lista": """
+            DISEÑO LISTA PROFESIONAL:
+            - Header con "🎯 TOP TIPS"
+            - Elementos numerados o con viñetas premium
+            - Cada item en card separada con ícono
+            - Jerarquía visual clara
+            - Espaciado generoso entre elementos
+            """,
+            "hecho": """
+            DISEÑO DATO CURIOSO:
+            - Badge "🔥 DID YOU KNOW?"
+            - Hecho principal destacado
+            - Información adicional como soporte
+            - Elementos visuales que refuercen la sorpresa
+            - Layout que invite a compartir
+            """,
+            "tutorial": """
+            DISEÑO TUTORIAL STEP-BY-STEP:
+            - Header con "📋 HOW TO"
+            - Pasos numerados claramente
+            - Cada paso en sección diferenciada
+            - Progreso visual (barra o círculos)
+            - Call-to-action final
+            """
+        }
+        
+        content_template = design_templates.get(params['content_type'], design_templates["tip"])
+        
+        # Especificaciones por red social
+        platform_specs = {
+            "instagram_square": "Instagram Feed - Diseño cuadrado, elementos centrados, tipografía grande para móvil",
+            "instagram_story": "Instagram Stories - Diseño vertical, información en tercios, touch-friendly",
+            "linkedin_post": "LinkedIn - Estilo corporativo profesional, información clara, CTA sutil",
+            "twitter_post": "Twitter - Información concisa, tipografía legible en timeline",
+            "facebook_post": "Facebook - Diseño horizontal, amigable, call-to-action claro"
+        }
+        
+        platform_context = platform_specs.get(params['formato'], "Red social profesional")
+        
+        # Contenido específico
+        content_specs = self._get_enhanced_content_specifications(params)
+        
+        # Incluir mejores plantillas como referencia
+        template_examples = ""
         if templates:
-            template_content = f"\n--- TEMPLATE DE REFERENCIA ---\n"
-            template_content += templates[0]['content']
+            premium_templates = [t for t in templates if t.get('type') == 'premium']
+            if premium_templates:
+                template_examples = f"\n--- REFERENCIA PREMIUM ---\n"
+                template_examples += premium_templates[0]['content'][:500]
         
-        # Prompt específico según tipo de contenido
-        content_specs = self._get_content_specifications(params)
-        
-        return f"""Genera un post HTML completo para {dimensions['name']} ({dimensions['width']}x{dimensions['height']}px).
+        return f"""BRIEF DE DISEÑO PROFESIONAL:
 
-{template_content}
+📋 ESPECIFICACIONES TÉCNICAS:
+- Plataforma: {platform_context}
+- Dimensiones: {dimensions['width']}x{dimensions['height']}px exactos
+- Formato: {dimensions['name']}
 
-CONTENIDO REQUERIDO:
+🎨 PALETA CROMÁTICA PROFESIONAL:
+- Primary: {selected_scheme['primary']} ({selected_scheme['description']})
+- Secondary: {selected_scheme['secondary']}
+- Accent: {selected_scheme['accent']}
+- Background: {selected_scheme['background']}
+- Text: {selected_scheme['text']}
+
+📐 TEMPLATE DE DISEÑO:
+{content_template}
+
+📝 CONTENIDO A INCLUIR:
 {content_specs}
 
-ESPECIFICACIONES TÉCNICAS:
-- Tema: {params['tema']}
-- Estilo: {params['estilo']}
-- Colores: {params['colores']}
-- Dimensiones exactas: {dimensions['width']}x{dimensions['height']}px
+🎯 ESTILO VISUAL: {params['estilo']}
+- Tema principal: {params['tema']}
+- Tono: Profesional pero accesible
+- Target: {self._get_target_audience(params)}
 
-ESTRUCTURA HTML OBLIGATORIA:
+{template_examples}
+
+⚡ REQUERIMIENTOS TÉCNICOS:
 ```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{params['nombre_archivo']}</title>
+    <title>{params.get('titulo', params['tema'])}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body {{ font-family: 'Inter', sans-serif; }}
+        .container {{ width: {dimensions['width']}px; height: {dimensions['height']}px; }}
+    </style>
 </head>
-<body style="width: {dimensions['width']}px; height: {dimensions['height']}px; margin: 0; padding: 0;">
-    <!-- TU CONTENIDO AQUÍ -->
+<body class="m-0 p-0 overflow-hidden">
+    <div class="container mx-auto">
+        <!-- TU DISEÑO PREMIUM AQUÍ -->
+    </div>
 </body>
 </html>
 ```
 
-REGLAS ESTRICTAS:
-- Responde ÚNICAMENTE con HTML válido y completo
-- Usa SOLO Tailwind CSS (CDN incluido)
-- Centrado vertical y horizontal
-- Tipografía legible para móvil
-- Sin scroll, contenido debe caber en las dimensiones exactas
-- NO incluyas explicaciones, solo código HTML"""
+🎨 INSPIRACIÓN: Diseño nivel Behance Top Shot, calidad agencia premium.
+
+GENERA ÚNICAMENTE EL HTML COMPLETO. Sin explicaciones adicionales."""
+
+    def _get_enhanced_content_specifications(self, params):
+        """Especificaciones de contenido mejoradas"""
+        content_type = params['content_type']
+        
+        if content_type == "tip":
+            return f"""
+            TIP PROFESIONAL: {params.get('titulo', 'Consejo de experto')}
+            Descripción: {params.get('descripcion', 'Insight valioso para profesionales')}
+            
+            ELEMENTOS REQUERIDOS:
+            - Badge "💡 PRO TIP" en la esquina superior
+            - Título impactante y accionable
+            - Descripción clara con beneficio específico
+            - Call-to-action sutil ("Guarda este tip")
+            - Iconografía moderna relacionada al tema
+            """
+        elif content_type == "quote":
+            autor_text = f"- {params.get('autor', 'Autor Anónimo')}" if params.get('autor') else "- Sabiduría Popular"
+            return f"""
+            QUOTE INSPIRACIONAL: "{params.get('frase', 'La excelencia es un hábito, no un acto.')}"
+            Autor: {autor_text}
+            
+            ELEMENTOS REQUERIDOS:
+            - Comillas decorativas de gran tamaño
+            - Texto de cita como elemento principal
+            - Autor con tipografía distinguida
+            - Elemento visual que refuerce el mensaje
+            - Layout que invite a compartir
+            """
+        elif content_type == "estadistica":
+            return f"""
+            ESTADÍSTICA IMPACTANTE: {params.get('numero', '85%')}
+            Contexto: {params.get('descripcion', 'De los profesionales exitosos aplican esta práctica')}
+            
+            ELEMENTOS REQUERIDOS:
+            - Número estadístico como hero element
+            - Visualización gráfica simple (progreso, chart)
+            - Descripción que dé contexto y relevancia
+            - Badge "📊 DATA INSIGHT"
+            - Fuente de datos (si aplica)
+            """
+        elif content_type == "concepto":
+            nivel_badges = {"basico": "🌱 BEGINNER", "intermedio": "🚀 INTERMEDIATE", "avanzado": "⚡ ADVANCED"}
+            nivel_badge = nivel_badges.get(params.get('nivel', 'intermedio'), '🚀 INTERMEDIATE')
+            
+            return f"""
+            CONCEPTO TÉCNICO: {params.get('concepto', 'Concepto Fundamental')}
+            Nivel: {nivel_badge}
+            Explicación: {params.get('descripcion', 'Explicación clara y práctica')}
+            Incluir ejemplo: {params.get('incluir_ejemplo', True)}
+            
+            ELEMENTOS REQUERIDOS:
+            - Título del concepto prominente
+            - Badge de nivel de dificultad
+            - Explicación en lenguaje claro
+            - Ejemplo práctico (si se solicita)
+            - Iconografía tech moderna
+            """
+        elif content_type == "lista":
+            return f"""
+            LISTA PROFESIONAL: {params.get('titulo', 'Lista de consejos')}
+            Tipo: {params.get('descripcion', 'Lista útil para profesionales')}
+            
+            ELEMENTOS REQUERIDOS:
+            - Header "🎯 TOP TIPS" 
+            - Elementos numerados o con viñetas
+            - Cada item destacado visualmente
+            - Iconografía consistente
+            - Jerarquía clara de información
+            """
+        elif content_type == "hecho":
+            return f"""
+            HECHO CURIOSO: {params.get('titulo', '¿Sabías que...?')}
+            Contenido: {params.get('descripcion', 'Dato fascinante')}
+            
+            ELEMENTOS REQUERIDOS:
+            - Badge "🔥 DID YOU KNOW?"
+            - Hecho principal como protagonista
+            - Información que genere sorpresa
+            - Elementos visuales que refuercen el dato
+            - Layout viral para compartir
+            """
+        elif content_type == "tutorial":
+            return f"""
+            TUTORIAL: {params.get('titulo', 'Cómo hacer...')}
+            Pasos: {params.get('pasos', '4')} pasos
+            
+            ELEMENTOS REQUERIDOS:
+            - Header "📋 HOW TO"
+            - Pasos numerados claramente
+            - Progreso visual (1/4, 2/4, etc.)
+            - Cada paso diferenciado
+            - Call-to-action al final
+            """
+        
+        return f"CONTENIDO: {params.get('tema', 'Contenido profesional')}"
+    
+    def _get_target_audience(self, params):
+        """Determina la audiencia objetivo basándose en el tema"""
+        tema = params.get('tema', '').lower()
+        
+        if any(word in tema for word in ['programación', 'desarrollo', 'código', 'tech', 'software']):
+            return "Desarrolladores y profesionales tech"
+        elif any(word in tema for word in ['marketing', 'ventas', 'negocio', 'business']):
+            return "Profesionales de marketing y ventas"
+        elif any(word in tema for word in ['diseño', 'ux', 'ui', 'creatividad']):
+            return "Diseñadores y creativos"
+        elif any(word in tema for word in ['emprendimiento', 'startup', 'empresa']):
+            return "Emprendedores y fundadores"
+        elif any(word in tema for word in ['finanzas', 'inversión', 'dinero']):
+            return "Profesionales financieros"
+        elif any(word in tema for word in ['salud', 'fitness', 'bienestar']):
+            return "Profesionales de la salud y wellness"
+        elif any(word in tema for word in ['educación', 'enseñanza', 'curso']):
+            return "Educadores y estudiantes"
+        else:
+            return "Profesionales y ejecutivos"
     
     def _get_content_specifications(self, params):
-        """Especificaciones según tipo de contenido"""
+        """Especificaciones según tipo de contenido (método legacy)"""
         content_type = params['content_type']
         
         if content_type == "tip":
@@ -391,27 +732,36 @@ REGLAS ESTRICTAS:
         return f"CONTENIDO: {params.get('tema', 'Contenido general')}"
     
     def _create_basic_html_template(self, params, dimensions):
-        """Crea plantilla HTML básica sin IA"""
+        """Crea plantilla HTML básica mejorada sin IA"""
         content_type = params['content_type']
         
-        # Contenido específico según tipo
+        # Contenido específico según tipo con mejor diseño
         if content_type == "tip":
             main_content = f"""
-            <div class="text-blue-600 text-sm font-semibold mb-2">💡 TIP PROFESIONAL</div>
-            <h1 class="text-2xl font-bold mb-4 text-gray-800">{params.get('titulo', 'Consejo Profesional')}</h1>
-            <p class="text-gray-600 text-base leading-relaxed">{params.get('descripcion', 'Consejo útil para profesionales')}</p>
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-bold px-4 py-2 rounded-full mb-6 inline-block">
+                💡 TIP PROFESIONAL
+            </div>
+            <h1 class="text-3xl font-bold mb-6 text-gray-800 leading-tight">{params.get('titulo', 'Consejo Profesional')}</h1>
+            <p class="text-gray-600 text-lg leading-relaxed mb-6">{params.get('descripcion', 'Consejo útil para profesionales')}</p>
+            <div class="text-blue-500 text-sm font-semibold">💾 Guarda este tip</div>
             """
         elif content_type == "quote":
             main_content = f"""
-            <div class="text-6xl text-gray-300 mb-4">"</div>
-            <p class="text-xl font-medium text-gray-800 italic mb-4">{params.get('frase', 'Frase inspiracional')}</p>
-            {f'<div class="text-gray-600">- {params.get("autor", "")}</div>' if params.get('autor') else ''}
+            <div class="text-8xl text-blue-500 opacity-20 mb-6">"</div>
+            <p class="text-2xl font-medium text-gray-800 italic mb-6 leading-relaxed">{params.get('frase', 'Frase inspiracional')}</p>
+            <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-4"></div>
+            {f'<div class="text-gray-600 font-semibold">— {params.get("autor", "Anónimo")}</div>' if params.get('autor') else ''}
             """
         elif content_type == "estadistica":
             main_content = f"""
-            <div class="text-5xl font-bold text-blue-600 mb-4">{params.get('numero', '85%')}</div>
-            <p class="text-lg text-gray-700">{params.get('descripcion', 'Estadística relevante')}</p>
-            <div class="text-sm text-gray-500 mt-4">📊 ESTADÍSTICA</div>
+            <div class="bg-blue-100 text-blue-600 text-sm font-bold px-4 py-2 rounded-full mb-6 inline-block">
+                📊 DATA INSIGHT
+            </div>
+            <div class="text-6xl font-black text-blue-600 mb-4">{params.get('numero', '85%')}</div>
+            <div class="w-full bg-gray-200 rounded-full h-4 mb-6">
+                <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-4 rounded-full" style="width: {params.get('numero', '85').replace('%', '')}%"></div>
+            </div>
+            <p class="text-xl text-gray-700 leading-relaxed">{params.get('descripcion', 'Estadística relevante')}</p>
             """
         elif content_type == "concepto":
             nivel_emoji = {"basico": "🌱", "intermedio": "🚀", "avanzado": "⚡"}
@@ -420,15 +770,21 @@ REGLAS ESTRICTAS:
             nivel = nivel_text.get(params.get('nivel', 'intermedio'), 'Nivel Intermedio')
             
             main_content = f"""
-            <div class="text-purple-600 text-sm font-semibold mb-2">🧠 CONCEPTO TECH</div>
-            <h1 class="text-3xl font-bold mb-4 text-gray-800">{params.get('concepto', 'Concepto Técnico')}</h1>
-            <p class="text-gray-600 text-base leading-relaxed mb-4">{params.get('descripcion', 'Explicación técnica simplificada')}</p>
-            <div class="text-sm text-purple-500 font-medium">{emoji} {nivel}</div>
+            <div class="bg-purple-100 text-purple-600 text-sm font-bold px-4 py-2 rounded-full mb-6 inline-block">
+                🧠 CONCEPTO TECH
+            </div>
+            <h1 class="text-4xl font-bold mb-6 text-gray-800 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                {params.get('concepto', 'Concepto Técnico')}
+            </h1>
+            <p class="text-gray-600 text-lg leading-relaxed mb-6">{params.get('descripcion', 'Explicación técnica simplificada')}</p>
+            <div class="bg-gray-100 rounded-lg p-4">
+                <div class="text-purple-500 font-bold text-sm">{emoji} {nivel}</div>
+            </div>
             """
         else:
             main_content = f"""
-            <h1 class="text-2xl font-bold mb-4 text-gray-800">{params.get('titulo', params.get('tema', 'Contenido'))}</h1>
-            <p class="text-gray-600">{params.get('descripcion', 'Contenido sobre ' + params.get('tema', 'tema'))}</p>
+            <h1 class="text-3xl font-bold mb-6 text-gray-800">{params.get('titulo', params.get('tema', 'Contenido'))}</h1>
+            <p class="text-gray-600 text-lg leading-relaxed">{params.get('descripcion', 'Contenido sobre ' + params.get('tema', 'tema'))}</p>
             """
         
         return f"""<!DOCTYPE html>
@@ -438,12 +794,16 @@ REGLAS ESTRICTAS:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{params.get('nombre_archivo', 'post')}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        body {{ font-family: 'Inter', sans-serif; }}
+    </style>
 </head>
 <body style="width: {dimensions['width']}px; height: {dimensions['height']}px; margin: 0; padding: 0;">
-    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-white p-8">
-        <div class="text-center max-w-md">
+    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-8">
+        <div class="text-center max-w-2xl">
             {main_content}
-            <div class="mt-6 text-xs text-gray-400">{params.get('tema', 'Social Content')}</div>
+            <div class="mt-8 text-xs text-gray-400 font-medium">{params.get('tema', 'Social Content')} • Professional Design</div>
         </div>
     </div>
 </body>

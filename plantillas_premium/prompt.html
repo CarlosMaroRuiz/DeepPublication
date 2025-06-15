@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Arte de los Prompts</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 30%, #fde68a 60%, #f3e8ff 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 800px;
+            height: 800px;
+            box-shadow: 
+                0 25px 50px rgba(245, 158, 11, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .terminal-header {
+            background: linear-gradient(135deg, #1f2937, #374151);
+            border-radius: 12px 12px 0 0;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0;
+        }
+        
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .dot.red { background: #ef4444; }
+        .dot.yellow { background: #f59e0b; }
+        .dot.green { background: #10b981; }
+        
+        .terminal-title {
+            color: #d1d5db;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: auto;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .chat-container {
+            background: #ffffff;
+            border-radius: 0 0 12px 12px;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .title {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .messages-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+            justify-content: flex-start;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .avatar.user {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        
+        .avatar.ai {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            position: relative;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .message.user .message-content {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+        
+        .message.ai .message-content {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            color: #1f2937;
+            border: 1px solid #e5e7eb;
+            border-bottom-left-radius: 6px;
+        }
+        
+        .prompt-tag {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+        
+        .code-snippet {
+            background: #1f2937;
+            color: #10b981;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            margin-top: 8px;
+            border-left: 3px solid #10b981;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 18px;
+            background: #f3f4f6;
+            border-radius: 18px;
+            border-bottom-left-radius: 6px;
+            max-width: 80px;
+        }
+        
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: typing 1.4s ease-in-out infinite;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        .prompt-tips {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 1px solid #10b981;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+        
+        .tips-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .tips-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .tip-item {
+            font-size: 11px;
+            color: #047857;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .tip-item i {
+            color: #10b981;
+            font-size: 10px;
+        }
+        
+        .footer {
+            margin-top: auto;
+            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .brand {
+            font-size: 14px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f59e0b, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .floating-icons {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .floating-icon {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .floating-icon:nth-child(1) {
+            top: 15%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+        
+        .floating-icon:nth-child(2) {
+            top: 25%;
+            right: 8%;
+            animation-delay: 2s;
+        }
+        
+        .floating-icon:nth-child(3) {
+            bottom: 30%;
+            left: 8%;
+            animation-delay: 4s;
+        }
+        
+        .floating-icon:nth-child(4) {
+            bottom: 15%;
+            right: 5%;
+            animation-delay: 6s;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+        
+        @media (max-width: 640px) {
+            .container {
+                width: 95vmin;
+                height: 95vmin;
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 24px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+                font-size: 13px;
+                padding: 12px 16px;
+            }
+            
+            .tips-grid {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+            
+            .avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="floating-icons">
+            <i class="fas fa-pen-fancy floating-icon" style="font-size: 24px; color: #f59e0b;"></i>
+            <i class="fas fa-lightbulb floating-icon" style="font-size: 28px; color: #8b5cf6;"></i>
+            <i class="fas fa-comment-dots floating-icon" style="font-size: 26px; color: #10b981;"></i>
+            <i class="fas fa-magic floating-icon" style="font-size: 22px; color: #ef4444;"></i>
+        </div>
+        
+        <div class="header">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+                <div class="terminal-title">prompt-master.ai</div>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <h1 class="title">El Arte de los Prompts</h1>
+            <p class="subtitle">Comunicación efectiva con IA</p>
+            
+            <div class="messages-area">
+                <div class="message user">
+                    <div class="avatar user">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="message-content">
+                        ❌ "Escribe sobre marketing"
+                        <div class="prompt-tag">PROMPT VAGO</div>
+                    </div>
+                </div>
+                
+                <div class="message ai">
+                    <div class="avatar ai">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        Resultado genérico y poco útil. Falta contexto, audiencia y objetivo específico.
+                    </div>
+                </div>
+                
+                <div class="message user">
+                    <div class="avatar user">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="message-content">
+                        ✅ "Actúa como experto en marketing digital. Crea una estrategia de contenido para Instagram dirigida a emprendedores de 25-35 años en el sector tecnológico, con 5 tipos de posts y ejemplos específicos."
+                        <div class="prompt-tag">PROMPT EFECTIVO</div>
+                    </div>
+                </div>
+                
+                <div class="message ai">
+                    <div class="avatar ai">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        ¡Perfecto! Respuesta detallada con estrategia específica, tipos de contenido y ejemplos prácticos.
+                        <div class="code-snippet">Rol + Contexto + Audiencia + Formato = Resultado Premium</div>
+                    </div>
+                </div>
+                
+                <div class="message ai">
+                    <div class="avatar ai">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prompt-tips">
+                <div class="tips-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Claves para Prompts Efectivos
+                </div>
+                <div class="tips-grid">
+                    <div class="tip-item">
+                        <i class="fas fa-check"></i>
+                        Define un rol específico
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-check"></i>
+                        Proporciona contexto
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-check"></i>
+                        Especifica el formato
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-check"></i>
+                        Incluye ejemplos
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    
+    </div>
+</body>
+</html>

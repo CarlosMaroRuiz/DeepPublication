@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, jsonify, session
 from services.content_generator import ContentGeneratorService
 from services.intelligent_chat import IntelligentChatService
 from enums.social_dimensions import SOCIAL_DIMENSIONS
+from enums.professional_styles import PROFESSIONAL_COLOR_PALETTES, PROFESSIONAL_DESIGN_STYLES
 import uuid
 
 chat_bp = Blueprint('chat', __name__)
@@ -30,20 +31,32 @@ def get_content_types():
 
 @chat_bp.route('/api/styles')
 def get_styles():
-    """Obtiene los estilos visuales disponibles"""
-    styles = [
-        "Minimalista", "Moderno", "Profesional", "Colorido", 
-        "Gradientes", "Oscuro", "Neón", "Elegante"
-    ]
+    """Obtiene estilos de diseño profesionales"""
+    styles = []
+    for name, style in PROFESSIONAL_DESIGN_STYLES.items():
+        styles.append({
+            "id": name,
+            "name": name,
+            "description": style["description"],
+            "characteristics": style["characteristics"]
+        })
+    
     return jsonify(styles)
 
 @chat_bp.route('/api/color-palettes')
 def get_color_palettes():
-    """Obtiene las paletas de colores disponibles"""
-    palettes = [
-        "Azul profesional", "Verde tech", "Púrpura moderno", "Naranja energético",
-        "Rojo impactante", "Gradiente sunset", "Monocromático", "Colores marca"
-    ]
+    """Obtiene paletas de colores profesionales"""
+    palettes = []
+    for name, palette in PROFESSIONAL_COLOR_PALETTES.items():
+        palettes.append({
+            "id": name,
+            "name": name,
+            "description": palette["description"],
+            "primary": palette["primary"],
+            "gradient": palette["gradient"],
+            "best_for": palette["best_for"]
+        })
+    
     return jsonify(palettes)
 
 @chat_bp.route('/api/test-deepseek', methods=['POST'])
@@ -256,3 +269,77 @@ def reset_chat():
 def health_check():
     """Endpoint de salud"""
     return jsonify({'status': 'healthy', 'service': 'Social Content Generator'})
+
+
+
+@chat_bp.route('/api/intelligent-recommendations', methods=['POST'])
+def get_intelligent_recommendations():
+    """Obtiene recomendaciones de diseño basadas en contexto"""
+    try:
+        data = request.get_json()
+        content_service = ContentGeneratorService()
+        recommendations = content_service.get_intelligent_recommendations(data)
+        return jsonify({
+            'success': True,
+            'recommendations': recommendations
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@chat_bp.route('/api/design-preview', methods=['POST'])
+def get_design_preview():
+    """Genera preview rápido del diseño sin generar imagen"""
+    try:
+        data = request.get_json()
+        content_service = ContentGeneratorService()
+        
+        # Crear prompt simplificado para preview
+        system_prompt = "Genera HTML minimalista para preview rápido. Solo estructura básica con colores y tipografía."
+        
+        preview_params = {
+            'content_type': data.get('content_type', 'tip'),
+            'tema': data.get('tema', 'Preview'),
+            'formato': 'instagram_square',
+            'colores': data.get('colores', 'Azul profesional'),
+            'estilo': data.get('estilo', 'Moderno'),
+            'nombre_archivo': 'preview_temp'
+        }
+        
+        # Usar método simplificado
+        dimensions = SOCIAL_DIMENSIONS['instagram_square']
+        html_content = content_service._create_basic_html_template(preview_params, dimensions)
+        
+        return jsonify({
+            'success': True,
+            'html_preview': html_content,
+            'message': 'Preview generado'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@chat_bp.route('/api/templates/premium')
+def get_premium_templates():
+    """Lista plantillas premium disponibles"""
+    try:
+        content_service = ContentGeneratorService()
+        templates = content_service.load_templates()
+        
+        premium_templates = [t for t in templates if t.get('type') == 'premium']
+        
+        return jsonify({
+            'success': True,
+            'templates': premium_templates,
+            'count': len(premium_templates)
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500

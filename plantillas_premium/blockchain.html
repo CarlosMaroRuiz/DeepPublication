@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Qué es Blockchain?</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at center, #0f172a 0%, #1e293b 50%, #334155 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .container {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 30px;
+            width: 800px;
+            height: 800px;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 
+                0 0 100px rgba(6, 182, 212, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .cyber-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+        
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        
+        .content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .blockchain-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .block {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: blockPulse 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+        }
+        
+        .block:nth-child(2) { animation-delay: 0.3s; }
+        .block:nth-child(4) { animation-delay: 0.6s; }
+        
+        .block i {
+            color: white;
+            font-size: 20px;
+        }
+        
+        .chain-link {
+            width: 20px;
+            height: 4px;
+            background: linear-gradient(90deg, #06b6d4, #0891b2);
+            position: relative;
+            animation: linkGlow 3s ease-in-out infinite;
+        }
+        
+        @keyframes blockPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(6, 182, 212, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(6, 182, 212, 0.6); }
+        }
+        
+        @keyframes linkGlow {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        .title {
+            font-family: 'Orbitron', monospace;
+            font-size: 32px;
+            font-weight: 800;
+            color: #06b6d4;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .definition {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(8, 145, 178, 0.1));
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .definition::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.1), transparent);
+            animation: sweep 4s ease-in-out infinite;
+        }
+        
+        @keyframes sweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .definition-text {
+            font-size: 16px;
+            color: #e2e8f0;
+            text-align: center;
+            line-height: 1.5;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .blockchain-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            gap: 12px;
+        }
+        
+        .visual-block {
+            width: 80px;
+            height: 60px;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border: 2px solid #06b6d4;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: blockFloat 4s ease-in-out infinite;
+        }
+        
+        .visual-block:nth-child(2) { animation-delay: 0.5s; }
+        .visual-block:nth-child(4) { animation-delay: 1s; }
+        
+        .visual-block::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg, #06b6d4, transparent, #06b6d4);
+            border-radius: 14px;
+            z-index: -1;
+            animation: borderRotate 6s linear infinite;
+        }
+        
+        @keyframes blockFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        @keyframes borderRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .block-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+            color: #06b6d4;
+            font-weight: 700;
+        }
+        
+        .block-hash {
+            font-size: 8px;
+            color: #64748b;
+            font-family: monospace;
+        }
+        
+        .connection {
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, #06b6d4, #0891b2, #06b6d4);
+            position: relative;
+            animation: dataFlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes dataFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.8));
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(6, 182, 212, 0.4);
+            box-shadow: 0 8px 32px rgba(6, 182, 212, 0.15);
+        }
+        
+        .feature-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .feature-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+        }
+        
+        .feature-text {
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+        
+        .footer {
+            margin-top: auto;
+            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(6, 182, 212, 0.2);
+        }
+        
+        .brand {
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: #06b6d4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        @media (max-width: 640px) {
+            .container {
+                width: 95vmin;
+                height: 95vmin;
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 24px;
+            }
+            
+            .visual-block {
+                width: 60px;
+                height: 45px;
+            }
+            
+            .connection {
+                width: 20px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="cyber-grid"></div>
+        
+        <div class="content">
+            <div class="header">
+                <div class="blockchain-logo">
+                    <div class="block"><i class="fas fa-cube"></i></div>
+                    <div class="chain-link"></div>
+                    <div class="block"><i class="fas fa-cube"></i></div>
+                    <div class="chain-link"></div>
+                    <div class="block"><i class="fas fa-cube"></i></div>
+                </div>
+                <h1 class="title">Blockchain</h1>
+                <p class="subtitle">Cadena de Bloques Inmutable</p>
+            </div>
+            
+            <div class="definition">
+                <div class="definition-text">
+                    Una cadena de bloques inmutable donde cada transacción está conectada criptográficamente, creando un registro transparente y seguro
+                </div>
+            </div>
+            
+            <div class="blockchain-visual">
+                <div class="visual-block">
+                    <div class="block-number">Bloque #1</div>
+                    <div class="block-hash">hash: 0x4f7e...</div>
+                </div>
+                <div class="connection"></div>
+                <div class="visual-block">
+                    <div class="block-number">Bloque #2</div>
+                    <div class="block-hash">hash: 0x8a2b...</div>
+                </div>
+                <div class="connection"></div>
+                <div class="visual-block">
+                    <div class="block-number">Bloque #3</div>
+                    <div class="block-hash">hash: 0x1c9d...</div>
+                </div>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="feature-title">Inmutable</div>
+                    <div class="feature-text">Los datos no pueden ser alterados una vez registrados en la cadena</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="feature-title">Descentralizado</div>
+                    <div class="feature-text">No depende de una autoridad central, funciona en red distribuida</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="feature-title">Transparente</div>
+                    <div class="feature-text">Todas las transacciones son públicas y verificables</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="feature-title">Seguro</div>
+                    <div class="feature-text">Protegido por criptografía avanzada y consenso de red</div>
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</body>
+</html>
