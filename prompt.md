@@ -172,12 +172,3 @@ box-shadow: 0 8px 25px rgba(color, 0.2);
 ```
 
 ## 💡 **Tips para Generar Designs Premium:**
-
-1. **Empieza con el mood**: ¿Tech? ¿Elegante? ¿Futurista?
-2. **Define 3 colores máximo**: Primary + Secondary + Accent
-3. **Una animación principal**: Que defina la personalidad
-4. **Consistencia en spacing**: Usar múltiplos de 4px (8, 12, 16, 20, 24)
-5. **Hierarchy clara**: Grande → Mediano → Pequeño → Detalles
-6. **Always mobile**: Probar en 400px width mínimo
-
-¿Te ayudo a crear un prompt específico para algún tema que tengas en mente? 🎨
